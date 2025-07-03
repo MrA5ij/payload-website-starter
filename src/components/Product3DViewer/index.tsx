@@ -2,16 +2,24 @@
 
 import { Canvas, useLoader } from '@react-three/fiber'
 import { OrbitControls, Environment } from '@react-three/drei'
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader'
 import { ModelErrorBoundary } from './ErrorBoundary'
 
-type Props = {
-  modelUrl?: string
-}
+type Props = { modelUrl?: string }
 
-function Model({ url }: { url: string }) {
-  const gltf = useLoader(GLTFLoader, url)
+function Model({ url, setLoaded }: { url: string; setLoaded: () => void }) {
+  // Attach DRACOLoader for compressed models
+  const gltf = useLoader(GLTFLoader, url, (loader) => {
+    const dracoLoader = new DRACOLoader()
+    dracoLoader.setDecoderPath('/draco/') // Make sure draco files are at /public/draco/
+    loader.setDRACOLoader(dracoLoader)
+  })
+
+  // Signal loaded
+  setLoaded?.()
+
   return <primitive object={gltf.scene} dispose={null} />
 }
 
@@ -43,11 +51,9 @@ function Spinner() {
   )
 }
 
-/**
- * Product3DViewer component
- * Usage: <Product3DViewer modelUrl={media.url} />
- */
 export default function Product3DViewer({ modelUrl }: Props) {
+  const [isLoading, setLoading] = useState(true)
+
   if (!modelUrl)
     return (
       <div
@@ -57,6 +63,10 @@ export default function Product3DViewer({ modelUrl }: Props) {
         No 3D Model
       </div>
     )
+
+  // Called once the model is loaded
+  const handleLoaded = () => setLoading(false)
+
   return (
     <div
       style={{
@@ -66,14 +76,33 @@ export default function Product3DViewer({ modelUrl }: Props) {
         borderRadius: 16,
         overflow: 'hidden',
         boxShadow: '0 2px 14px #0001',
+        position: 'relative',
       }}
     >
+      {isLoading && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 2,
+            background: '#fff8',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Spinner />
+        </div>
+      )}
       <ModelErrorBoundary>
         <Canvas camera={{ position: [1.5, 1.5, 2.8], fov: 45 }}>
           <ambientLight intensity={0.9} />
           <directionalLight position={[3, 6, 5]} intensity={1.5} castShadow />
-          <Suspense fallback={<Spinner />}>
-            <Model url={modelUrl} />
+          <Suspense fallback={null}>
+            <Model url={modelUrl} setLoaded={handleLoaded} />
             <Environment preset="warehouse" background={false} />
           </Suspense>
           <OrbitControls enableRotate enableZoom enablePan enableDamping dampingFactor={0.12} />
@@ -83,5 +112,4 @@ export default function Product3DViewer({ modelUrl }: Props) {
   )
 }
 
-// Export for error fallback usage in other modules if needed
 export { ModelErrorBoundary } from './ErrorBoundary'

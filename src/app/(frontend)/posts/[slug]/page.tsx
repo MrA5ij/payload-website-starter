@@ -118,4 +118,4 @@ const queryPostBySlug = cache(async ({ slug }: { slug: string }) => {
 export const dynamic = 'force-dynamic' // Ensures the page is always fresh and not cached
 export const revalidate = 0 // Disable static regeneration for this page
 export const fetchCache = 'force-no-store' // Ensures no caching is applied to the fetch
-export const runtime = 'edge' // Use edge runtime for better performance
+//export const runtime = 'edge' // Use edge runtime for better performance
