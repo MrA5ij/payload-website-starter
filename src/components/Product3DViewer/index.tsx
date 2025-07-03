@@ -1,11 +1,9 @@
 'use client'
 
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useLoader } from '@react-three/fiber'
 import { OrbitControls, Environment } from '@react-three/drei'
 import { Suspense } from 'react'
-// @ts-expect-error: No type declarations for GLTFLoader
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-import { useLoader } from '@react-three/fiber'
 import { ModelErrorBoundary } from './ErrorBoundary'
 
 type Props = {
@@ -19,12 +17,16 @@ function Model({ url }: { url: string }) {
 
 function Spinner() {
   return (
-    <div className="flex flex-col items-center justify-center h-full w-full">
+    <div
+      className="flex flex-col items-center justify-center h-full w-full"
+      style={{ minHeight: 150 }}
+    >
       <svg
         className="animate-spin h-8 w-8 text-gray-400"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"
+        aria-label="Loading"
       >
         <circle
           className="opacity-25"
@@ -33,14 +35,18 @@ function Spinner() {
           r="10"
           stroke="currentColor"
           strokeWidth="4"
-        ></circle>
-        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+        />
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
       </svg>
       <span className="text-xs text-gray-400 mt-2">Loading Model…</span>
     </div>
   )
 }
 
+/**
+ * Product3DViewer component
+ * Usage: <Product3DViewer modelUrl={media.url} />
+ */
 export default function Product3DViewer({ modelUrl }: Props) {
   if (!modelUrl)
     return (
@@ -70,22 +76,12 @@ export default function Product3DViewer({ modelUrl }: Props) {
             <Model url={modelUrl} />
             <Environment preset="warehouse" background={false} />
           </Suspense>
-          <OrbitControls
-            enableRotate
-            enableZoom
-            enablePan
-            mouseButtons={{
-              LEFT: 0,
-              MIDDLE: 1,
-              RIGHT: 2,
-            }}
-            enableDamping
-            dampingFactor={0.12}
-            // Touch controls enabled by default
-          />
+          <OrbitControls enableRotate enableZoom enablePan enableDamping dampingFactor={0.12} />
         </Canvas>
       </ModelErrorBoundary>
     </div>
   )
 }
+
+// Export for error fallback usage in other modules if needed
 export { ModelErrorBoundary } from './ErrorBoundary'

@@ -70,6 +70,7 @@
     "@types/node": "22.5.4",
     "@types/react": "19.1.0",
     "@types/react-dom": "19.1.2",
+    "@types/three": "^0.178.0",
     "@vitejs/plugin-react": "4.5.2",
     "autoprefixer": "^10.4.19",
     "copyfiles": "^2.4.1",

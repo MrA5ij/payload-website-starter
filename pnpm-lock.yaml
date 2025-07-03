@@ -144,6 +144,9 @@ importers:
       '@types/react-dom':
         specifier: 19.1.2
         version: 19.1.2(@types/react@19.1.0)
+      '@types/three':
+        specifier: ^0.178.0
+        version: 0.178.0
       '@vitejs/plugin-react':
         specifier: 4.5.2
         version: 4.5.2(vite@7.0.1(@types/node@22.5.4)(jiti@1.21.7)(sass@1.77.4)(tsx@4.19.2)(yaml@2.8.0))
