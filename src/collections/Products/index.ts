@@ -1,10 +1,20 @@
 import type { CollectionConfig } from 'payload'
 
-const Products: CollectionConfig = {
+export const Products: CollectionConfig = {
   slug: 'products',
-  // ...your existing config...
+  access: {
+    read: () => true,
+    create: () => true,
+    update: () => true,
+    delete: () => true,
+  },
   fields: [
-    // ...your other fields...
+    {
+      name: 'title',
+      type: 'text',
+      required: true,
+    },
+    // Other fields as needed
     {
       name: 'model3d',
       label: '3D Model (GLTF/GLB)',
@@ -16,9 +26,8 @@ const Products: CollectionConfig = {
         mimeType: { in: ['model/gltf-binary', 'model/gltf+json'] },
       },
     },
-    // ...other fields...
   ],
 }
 
+// ---- یہ لائن لازمی add کرو ----
 export default Products
-export const collections = { Products }
