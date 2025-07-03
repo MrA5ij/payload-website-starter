@@ -7,13 +7,12 @@ import { getPayload } from 'payload'
 import { draftMode } from 'next/headers'
 import React, { cache } from 'react'
 import RichText from '@/components/RichText'
-
-import type { Post } from '@/payload-types'
-
+import type { Post, Media } from '@/payload-types'
 import { PostHero } from '@/heros/PostHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
+import Product3DViewer from '@/components/Product3DViewer'
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -41,6 +40,11 @@ type Args = {
   }>
 }
 
+// Helper type guard
+function isMedia(obj: unknown): obj is Media {
+  return !!obj && typeof obj === 'object' && 'url' in obj && typeof (obj as any).url === 'string'
+}
+
 export default async function Post({ params: paramsPromise }: Args) {
   const { isEnabled: draft } = await draftMode()
   const { slug = '' } = await paramsPromise
@@ -62,7 +66,16 @@ export default async function Post({ params: paramsPromise }: Args) {
 
       <div className="flex flex-col items-center gap-4 pt-8">
         <div className="container">
+          {/* ----------- 3D VIEWER INTEGRATION (Type-Safe, Null-Safe) ----------- */}
+          {isMedia(post.model3d) && typeof post.model3d.url === 'string' && (
+            <div className="mb-8 flex justify-center">
+              <Product3DViewer modelUrl={post.model3d.url || undefined} />
+            </div>
+          )}
+          {/* ----------- END 3D VIEWER ----------- */}
+
           <RichText className="max-w-[48rem] mx-auto" data={post.content} enableGutter={false} />
+
           {post.relatedPosts && post.relatedPosts.length > 0 && (
             <RelatedPosts
               className="mt-12 max-w-[52rem] lg:grid lg:grid-cols-subgrid col-start-1 col-span-3 grid-rows-[2fr]"
@@ -102,3 +115,7 @@ const queryPostBySlug = cache(async ({ slug }: { slug: string }) => {
 
   return result.docs?.[0] || null
 })
+export const dynamic = 'force-dynamic' // Ensures the page is always fresh and not cached
+export const revalidate = 0 // Disable static regeneration for this page
+export const fetchCache = 'force-no-store' // Ensures no caching is applied to the fetch
+export const runtime = 'edge' // Use edge runtime for better performance

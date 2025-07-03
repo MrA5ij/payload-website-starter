@@ -215,6 +215,10 @@ export interface Post {
   id: number;
   title: string;
   heroImage?: (number | null) | Media;
+  /**
+   * Upload .glb or .gltf only
+   */
+  model3d?: (number | null) | Media;
   content: {
     root: {
       type: string;
@@ -1131,6 +1135,7 @@ export interface FormBlockSelect<T extends boolean = true> {
 export interface PostsSelect<T extends boolean = true> {
   title?: T;
   heroImage?: T;
+  model3d?: T;
   content?: T;
   relatedPosts?: T;
   categories?: T;

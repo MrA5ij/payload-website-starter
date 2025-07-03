@@ -35,9 +35,6 @@ export const Posts: CollectionConfig<'posts'> = {
     read: authenticatedOrPublished,
     update: authenticated,
   },
-  // This config controls what's populated by default when a post is referenced
-  // https://payloadcms.com/docs/queries/select#defaultpopulate-collection-config-property
-  // Type safe if the collection slug generic is passed to `CollectionConfig` - `CollectionConfig<'posts'>
   defaultPopulate: {
     title: true,
     slug: true,
@@ -84,6 +81,19 @@ export const Posts: CollectionConfig<'posts'> = {
               type: 'upload',
               relationTo: 'media',
             },
+            // ===== 3D Model field ADDED here =====
+            {
+              name: 'model3d',
+              label: '3D Model (GLTF/GLB)',
+              type: 'upload',
+              relationTo: 'media',
+              required: false,
+              admin: { description: 'Upload .glb or .gltf only' },
+              filterOptions: {
+                mimeType: { in: ['model/gltf-binary', 'model/gltf+json'] },
+              },
+            },
+            // ===== END model3d =====
             {
               name: 'content',
               type: 'richText',
@@ -153,10 +163,7 @@ export const Posts: CollectionConfig<'posts'> = {
 
             MetaDescriptionField({}),
             PreviewField({
-              // if the `generateUrl` function is configured
               hasGenerateFn: true,
-
-              // field paths to match the target field for data
               titlePath: 'meta.title',
               descriptionPath: 'meta.description',
             }),
@@ -193,9 +200,6 @@ export const Posts: CollectionConfig<'posts'> = {
       hasMany: true,
       relationTo: 'users',
     },
-    // This field is only used to populate the user data via the `populateAuthors` hook
-    // This is because the `user` collection has access control locked to protect user privacy
-    // GraphQL will also not return mutated user data that differs from the underlying schema
     {
       name: 'populatedAuthors',
       type: 'array',
@@ -234,3 +238,6 @@ export const Posts: CollectionConfig<'posts'> = {
     maxPerDoc: 50,
   },
 }
+
+export default Posts
+export const collections = { Posts }
