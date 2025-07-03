@@ -3,6 +3,7 @@
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Environment } from '@react-three/drei'
 import { Suspense } from 'react'
+// @ts-expect-error: No type declarations for GLTFLoader
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { useLoader } from '@react-three/fiber'
 
